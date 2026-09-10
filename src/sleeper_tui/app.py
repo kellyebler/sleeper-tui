@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -728,7 +729,15 @@ class SleeperApp(App[None]):
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(prog="sleeper-tui", description="Sleeper fantasy football TUI")
+    if len(sys.argv) > 1 and sys.argv[1] == "publish":
+        from sleeper_tui.publish import publish_main
+
+        raise SystemExit(publish_main(sys.argv[2:]))
+
+    parser = argparse.ArgumentParser(
+        prog="sleeper-tui",
+        description="Sleeper fantasy football TUI. Stays local unless you run `sleeper-tui publish` with your own Datadog keys.",
+    )
     parser.add_argument("-u", "--username", help="Sleeper username")
     parser.add_argument("-l", "--league", help="League ID")
     parser.add_argument("-w", "--week", type=int, help="Week number")

@@ -48,7 +48,7 @@ class SleeperClient:
     async def user(self, username_or_id: str) -> dict[str, Any]:
         data = await self._get(f"/user/{username_or_id}")
         if not data or not data.get("user_id"):
-            raise UserNotFound(f"No Sleeper user named '{username_or_id}'")
+            raise UserNotFound("No Sleeper user found for that username")
         return data
 
     async def nfl_state(self) -> dict[str, Any]:
