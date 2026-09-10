@@ -147,7 +147,7 @@ def add_publish_parser(parser: argparse.ArgumentParser) -> None:
 def publish_main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="sleeper-tui publish",
-        description="Push Sleeper league rankings, matchups, and players to a Datadog dashboard",
+        description="Push Sleeper league rankings, matchups, and players to your Datadog account",
     )
     add_publish_parser(parser)
     args = parser.parse_args(argv)

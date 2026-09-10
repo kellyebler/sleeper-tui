@@ -18,12 +18,6 @@ from textual.widgets import Button, DataTable, Footer, Input, Label, Select, Sta
 
 from sleeper_tui.api import SleeperClient, SleeperError, UserNotFound
 from sleeper_tui.config import AppConfig
-from sleeper_tui.telemetry import (
-    monitoring_requested,
-    setup_telemetry,
-    shutdown_telemetry,
-    trace_operation,
-)
 from sleeper_tui.domain import (
     LeagueWeek,
     MatchupSummary,
@@ -438,7 +432,6 @@ class SleeperApp(App[None]):
 
     async def on_unmount(self) -> None:
         await self.client.aclose()
-        shutdown_telemetry()
 
     def _ask_username(self) -> None:
         self.push_screen(SetupScreen(), self._on_username)
@@ -639,24 +632,19 @@ class SleeperApp(App[None]):
         self._set_toast("")
         self._set_status("Loading leagues…")
         try:
-            with trace_operation("bootstrap") as span:
-                user, state, players = await asyncio.gather(
-                    self.client.user(self.config.username),
-                    self.client.nfl_state(),
-                    self.client.players(),
-                )
-                self.username = user["username"]
-                self.user_id = user["user_id"]
-                self.config.username = self.username
-                self.config.user_id = self.user_id
-                self.season = str(state.get("league_season") or state.get("season") or "")
-                self.week = self._week_override or int(state.get("display_week") or state.get("week") or 1)
-                self.players = players
-                self.leagues = await self.client.leagues(self.user_id, self.season)
-                span.set_attribute("user.id", self.user_id)
-                span.set_attribute("sleeper.season", self.season)
-                span.set_attribute("sleeper.week", self.week)
-                span.set_attribute("sleeper.league.count", len(self.leagues))
+            user, state, players = await asyncio.gather(
+                self.client.user(self.config.username),
+                self.client.nfl_state(),
+                self.client.players(),
+            )
+            self.username = user["username"]
+            self.user_id = user["user_id"]
+            self.config.username = self.username
+            self.config.user_id = self.user_id
+            self.season = str(state.get("league_season") or state.get("season") or "")
+            self.week = self._week_override or int(state.get("display_week") or state.get("week") or 1)
+            self.players = players
+            self.leagues = await self.client.leagues(self.user_id, self.season)
         except UserNotFound as exc:
             self._set_status("")
             self._set_toast(str(exc))
@@ -697,42 +685,33 @@ class SleeperApp(App[None]):
         self._set_status("Loading matchup…")
         self._set_week_label()
         try:
-            with trace_operation(
-                "load matchup",
-                **{
-                    "user.id": self.user_id,
-                    "sleeper.league.id": self.league_id,
-                    "sleeper.week": self.week,
-                    "sleeper.season": self.season,
-                },
-            ):
-                league, rosters, users, matchups, stats, projections = await asyncio.gather(
-                    self.client.league(self.league_id),
-                    self.client.rosters(self.league_id),
-                    self.client.users(self.league_id),
-                    self.client.matchups(self.league_id, self.week),
-                    self.client.stats(self.season, self.week),
-                    self.client.projections(self.season, self.week),
-                )
-                self.week_data = build_league_week(
-                    week=self.week,
-                    season=self.season,
-                    league=league,
-                    user_id=self.user_id,
-                    rosters=rosters,
-                    users=users,
-                    matchups=matchups,
-                    players=self.players,
-                    stats=stats,
-                    projections=projections,
-                )
-                focus = self.selected_roster_id
-                if focus is None or not self.week_data.contains_roster(focus):
-                    focus = self.week_data.user_roster_id
-                if focus is None:
-                    raise ValueError("No roster found for this user in the selected league.")
-                self.selected_roster_id = focus
-                self.view = self.week_data.view_for(focus)
+            league, rosters, users, matchups, stats, projections = await asyncio.gather(
+                self.client.league(self.league_id),
+                self.client.rosters(self.league_id),
+                self.client.users(self.league_id),
+                self.client.matchups(self.league_id, self.week),
+                self.client.stats(self.season, self.week),
+                self.client.projections(self.season, self.week),
+            )
+            self.week_data = build_league_week(
+                week=self.week,
+                season=self.season,
+                league=league,
+                user_id=self.user_id,
+                rosters=rosters,
+                users=users,
+                matchups=matchups,
+                players=self.players,
+                stats=stats,
+                projections=projections,
+            )
+            focus = self.selected_roster_id
+            if focus is None or not self.week_data.contains_roster(focus):
+                focus = self.week_data.user_roster_id
+            if focus is None:
+                raise ValueError("No roster found for this user in the selected league.")
+            self.selected_roster_id = focus
+            self.view = self.week_data.view_for(focus)
         except (SleeperError, ValueError, TypeError) as exc:
             self.week_data = None
             self.view = None
@@ -757,22 +736,12 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(
         prog="sleeper-tui",
-        description="Sleeper fantasy football TUI. Use `sleeper-tui publish` to push league data to Datadog.",
+        description="Sleeper fantasy football TUI. Stays local unless you run `sleeper-tui publish` with your own Datadog keys.",
     )
     parser.add_argument("-u", "--username", help="Sleeper username")
     parser.add_argument("-l", "--league", help="League ID")
     parser.add_argument("-w", "--week", type=int, help="Week number")
-    parser.add_argument(
-        "--monitor",
-        action="store_true",
-        help="Send traces and metrics to Datadog over OTLP (uses DD_API_KEY, no local Agent)",
-    )
     args = parser.parse_args()
-    if monitoring_requested(args.monitor) and not setup_telemetry():
-        raise SystemExit(
-            "Monitoring was requested but no exporter is available. "
-            "Set DD_API_KEY (and optional DD_SITE) or OTEL_EXPORTER_OTLP_ENDPOINT."
-        )
     SleeperApp(username=args.username, league_id=args.league, week=args.week).run()
 
 

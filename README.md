@@ -36,7 +36,7 @@ Use the league dropdown to jump between leagues. **Proj** is Sleeper's weekly pr
 
 ## Datadog
 
-Datadog cannot query Sleeper on its own. `sleeper-tui publish` pulls the public API and writes custom metrics, then upserts a dashboard titled **Sleeper fantasy football**.
+The TUI never talks to Datadog on its own. Anyone who wants a board can publish into **their own** Datadog account. Use your API and application keys; do not share them.
 
 ```bash
 export DD_API_KEY=...
@@ -44,16 +44,7 @@ export DD_APP_KEY=...
 uv run sleeper-tui publish
 ```
 
-`--dry-run` fetches Sleeper and builds the payload without calling Datadog. Re-run publish (or cron it) whenever you want scores refreshed. The dashboard includes team names, player names, standings, this week's matchups, and starter points. Use the **league** template variable if you publish more than one league.
-
-Optional APM for the TUI process itself (latency of `bootstrap` / `load matchup`, no fantasy names). It sends OTLP straight to Datadog intake — no local Agent:
-
-```bash
-export DD_API_KEY=...
-uv run sleeper-tui --monitor
-```
-
-Set `DD_SITE` if the org is not on `datadoghq.com`. `OTEL_EXPORTER_OTLP_ENDPOINT` overrides the intake URL if you already have a collector.
+That reads the public Sleeper API from your machine and upserts a dashboard titled **Sleeper fantasy football** in the org those keys belong to. `--dry-run` builds the payload without calling Datadog. Re-run publish to refresh scores. The dashboard includes team names, player names, standings, this week's matchups, and starter points. Use the **league** template variable if you publish more than one league. Set `DD_SITE` if the org is not on `datadoghq.com`.
 
 ## Notes
 
