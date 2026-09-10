@@ -1,0 +1,255 @@
+$ff-bg: #10141c;
+$ff-card: #171d28;
+$ff-card-2: #1d2533;
+$ff-line: #2a3344;
+$ff-mint: #3ee0a2;
+$ff-mint-dim: #1f6f54;
+$ff-fg: #e8edf5;
+$ff-muted: #8b97ab;
+$ff-warn: #f5c542;
+$ff-danger: #ff6b6b;
+$ff-you: #7cb8ff;
+
+Screen {
+    background: $ff-bg;
+    color: $ff-fg;
+}
+
+#setup-wrap {
+    align: center middle;
+    height: 1fr;
+}
+
+#setup-card {
+    width: 62;
+    height: auto;
+    padding: 2 3;
+    background: $ff-card;
+    border: round $ff-mint-dim;
+}
+
+#setup-title {
+    text-style: bold;
+    color: $ff-mint;
+    width: 100%;
+    content-align: center middle;
+}
+
+#setup-sub {
+    color: $ff-muted;
+    width: 100%;
+    content-align: center middle;
+    padding-bottom: 1;
+}
+
+#username {
+    width: 100%;
+    margin: 1 0;
+}
+
+#setup-error {
+    color: $ff-danger;
+    height: 1;
+}
+
+#setup-go {
+    width: 100%;
+    margin-top: 1;
+    background: $ff-mint-dim;
+    color: $ff-fg;
+}
+
+HeaderBar {
+    height: 3;
+    padding: 0 1;
+    background: $ff-card;
+    border-bottom: solid $ff-line;
+}
+
+#title-row {
+    height: 1;
+}
+
+#title {
+    text-style: bold;
+    color: $ff-mint;
+}
+
+#subtitle {
+    color: $ff-muted;
+    padding-left: 1;
+}
+
+#controls {
+    height: 1;
+    align: left middle;
+}
+
+#league-select {
+    width: 36;
+    max-width: 50%;
+}
+
+#week-label {
+    width: auto;
+    padding: 0 1;
+    color: $ff-fg;
+    text-style: bold;
+}
+
+#status {
+    color: $ff-muted;
+    padding-left: 1;
+}
+
+Scoreboard {
+    height: 5;
+    padding: 0 1;
+    background: $ff-card-2;
+    border-bottom: solid $ff-line;
+}
+
+#board {
+    width: 1fr;
+    height: 1fr;
+    align: center middle;
+}
+
+.score {
+    width: 1fr;
+    height: 1fr;
+    content-align: center middle;
+}
+
+#vs {
+    width: 6;
+    height: 1fr;
+    color: $ff-muted;
+    text-style: bold;
+    content-align: center middle;
+}
+
+#boards {
+    height: 1fr;
+}
+
+#lineup {
+    height: 1fr;
+}
+
+#slate {
+    display: none;
+    height: 1fr;
+    padding: 0 1;
+}
+
+#slate-heading {
+    color: $ff-mint;
+    text-style: bold;
+    height: 1;
+    padding-top: 1;
+}
+
+#slate-sub {
+    color: $ff-muted;
+    height: 1;
+    padding-bottom: 1;
+}
+
+#week-slate {
+    height: 1fr;
+}
+
+TeamPanel {
+    width: 1fr;
+    height: 1fr;
+    padding: 0 1 0 1;
+}
+
+TeamPanel.you {
+    border-right: solid $ff-line;
+}
+
+.section {
+    color: $ff-muted;
+    text-style: bold;
+    padding: 1 0 0 0;
+    height: 2;
+}
+
+TeamPanel.you .section {
+    color: $ff-you;
+}
+
+TeamPanel.opp .section {
+    color: $ff-warn;
+}
+
+DataTable {
+    height: 1fr;
+    background: $ff-bg;
+}
+
+DataTable > .datatable--header {
+    text-style: bold;
+    color: $ff-muted;
+    background: $ff-card;
+}
+
+DataTable > .datatable--cursor {
+    background: $ff-mint-dim;
+    color: $ff-fg;
+}
+
+#toast {
+    dock: bottom;
+    height: auto;
+    padding: 0 1;
+    color: $ff-danger;
+}
+
+Footer {
+    background: $ff-card;
+}
+
+PlayerScreen {
+    align: center middle;
+    background: rgba(8, 10, 14, 0.72);
+}
+
+#player-card {
+    width: 92;
+    max-width: 100%;
+    height: 34;
+    max-height: 90%;
+    padding: 1 2;
+    background: $ff-card;
+    border: round $ff-mint-dim;
+}
+
+#player-status {
+    height: auto;
+    padding-bottom: 1;
+}
+
+#news-heading {
+    color: $ff-mint;
+    text-style: bold;
+    height: 1;
+}
+
+#news-scroll {
+    height: 1fr;
+    border-top: solid $ff-line;
+    padding-top: 1;
+}
+
+#player-news {
+    height: auto;
+}
+
+#player-hint {
+    color: $ff-muted;
+    height: 1;
+    padding-top: 1;
+}
